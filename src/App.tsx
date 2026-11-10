@@ -517,7 +517,7 @@ function App() {
   // ---------- pantallas ----------
 
   const authHeader = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div className="authHeader" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
       <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>{t('app.conectado_como')} <strong>{auth?.nombre}</strong></span>
       <select
         value={idioma}

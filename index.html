@@ -43,11 +43,15 @@
     <script>
       /* ============================================================
          FONDO INTERACTIVO DE PARTÍCULAS (constelación)
-         PC: sigue el ratón. Móvil: sigue el dedo.
+         PC: sigue el ratón. Móvil: sigue el dedo (60% menos partículas).
          ============================================================ */
       (function () {
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
+
+        // Detectar móvil para reducir partículas y mejorar rendimiento
+        const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                        || window.innerWidth < 768;
 
         let width, height;
         let particles = [];
@@ -99,7 +103,8 @@
         }
 
         function initParticles() {
-          const count = 150;
+          // 60% menos partículas en móvil para rendimiento
+          const count = esMovil ? 60 : 150;
           particles = [];
           for (let i = 0; i < count; i++) particles.push(new Particle());
         }
