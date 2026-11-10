@@ -5,6 +5,7 @@
   --red: #ff1a1a;
   --amber: #ffaa00;
   --border: #330000;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 * {
@@ -16,11 +17,64 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: var(--font-ui);
   line-height: 1.6;
   overflow-x: hidden;
   position: relative;
   z-index: 1;
+}
+
+/* Fuente user-friendly para pantallas de auth */
+.login-card,
+.register-card {
+  font-family: var(--font-ui);
+}
+
+.login-card h2,
+.register-card h2 {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.login-card .form-group input,
+.register-card .form-group input {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+}
+
+/* ===== Animación de vibración (shake) para inputs ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.input-error {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.45);
+  outline: none;
+  background: #0a0000;
+}
+
+/* ===== Botones con animaciones ===== */
+.btn {
+  transition: all 0.2s ease;
+  transform: scale(1);
+}
+
+.btn:hover {
+  background: var(--amber);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 170, 0, 0.35);
+}
+
+.btn:active {
+  transform: scale(0.95);
 }
 
 #root {

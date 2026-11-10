@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -53,6 +53,9 @@ function App() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [shake, setShake] = useState(false);
 
   // Filtro
   const [filtro, setFiltro] = useState('');
@@ -121,6 +124,7 @@ function App() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setShake(false);
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -128,7 +132,12 @@ function App() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) { mostrar(data.error || 'Credenciales inválidas', 'error'); return; }
+      if (!res.ok) {
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+        mostrar(data.error || 'Credenciales inválidas', 'error');
+        return;
+      }
       localStorage.setItem('token', data.token);
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
       setAuth({ ...data.usuario, token: data.token });
@@ -223,11 +232,25 @@ function App() {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label>Email</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input
+              ref={emailRef}
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={shake ? 'input-error shake' : ''}
+            />
           </div>
           <div className="form-group">
             <label>Contraseña</label>
-            <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              ref={passwordRef}
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={shake ? 'input-error shake' : ''}
+            />
           </div>
           <button type="submit" className="btn">Ingresar</button>
         </form>
