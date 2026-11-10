@@ -544,8 +544,8 @@ function App() {
   if (vista === 'login') {
     return (
       <div className="login-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-          <h2>{t('login.titulo')}</h2>
+        <div className="login-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+          <h2 style={{ margin: 0 }}>{t('login.titulo')}</h2>
           <select
             value={idioma}
             onChange={(e) => cambiarIdioma(e.target.value as Idioma)}
@@ -600,8 +600,8 @@ function App() {
   if (vista === 'register') {
     return (
       <div className="login-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-          <h2>{t('register.titulo')}</h2>
+        <div className="login-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+          <h2 style={{ margin: 0 }}>{t('register.titulo')}</h2>
           <select
             value={idioma}
             onChange={(e) => cambiarIdioma(e.target.value as Idioma)}
