@@ -5,9 +5,153 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel de Administración</title>
+    <style>
+      /* Capas de fondo interactivas */
+      .bg-layer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: -1;
+      }
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+      }
+      .bg-overlay {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.85) 100%);
+        z-index: -1;
+        backdrop-filter: blur(2px);
+        pointer-events: none;
+      }
+    </style>
   </head>
   <body>
+    <div class="bg-layer">
+      <canvas id="particle-canvas"></canvas>
+      <div class="bg-overlay"></div>
+    </div>
     <div id="root"></div>
+    <script>
+      /* ============================================================
+         FONDO INTERACTIVO DE PARTÍCULAS (constelación)
+         PC: sigue el ratón. Móvil: sigue el dedo.
+         ============================================================ */
+      (function () {
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        let mouse = { x: null, y: null, active: false };
+
+        function resize() {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+          initParticles();
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+          constructor() { this.reset(); }
+          reset() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.size = Math.random() * 2 + 1;
+            this.alpha = Math.random() * 0.5 + 0.1;
+          }
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+            if (mouse.active) {
+              const dx = mouse.x - this.x;
+              const dy = mouse.y - this.y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < 200) {
+                const force = (200 - dist) / 200;
+                this.vx += (dx / dist) * force * 0.02;
+                this.vy += (dy / dist) * force * 0.02;
+              }
+            }
+            const speed = Math.hypot(this.vx, this.vy);
+            if (speed > 1.5) {
+              this.vx = (this.vx / speed) * 1.5;
+              this.vy = (this.vy / speed) * 1.5;
+            }
+            if (this.alpha > 0) this.alpha -= 0.001;
+            if (this.alpha <= 0) this.reset();
+          }
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 26, 26, ' + this.alpha + ')';
+            ctx.fill();
+          }
+        }
+
+        function initParticles() {
+          const count = Math.min(80, Math.floor((width * height) / 20000));
+          particles = [];
+          for (let i = 0; i < count; i++) particles.push(new Particle());
+        }
+
+        function draw() {
+          ctx.clearRect(0, 0, width, height);
+          ctx.beginPath();
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < 150) {
+                const opacity = 1 - dist / 150;
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.strokeStyle = 'rgba(255, 170, 0, ' + (opacity * 0.4) + ')';
+                ctx.lineWidth = 0.8;
+              }
+            }
+          }
+          ctx.stroke();
+          particles.forEach(function (p) { p.update(); p.draw(); });
+          if (mouse.active) {
+            ctx.beginPath();
+            ctx.arc(mouse.x, mouse.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 170, 0, 0.8)';
+            ctx.fill();
+          }
+          requestAnimationFrame(draw);
+        }
+
+        function setMouse(x, y, active) {
+          mouse.x = x; mouse.y = y; mouse.active = active;
+        }
+
+        window.addEventListener('mousemove', function (e) { setMouse(e.clientX, e.clientY, true); });
+        window.addEventListener('mouseleave', function () { setMouse(null, null, false); });
+        window.addEventListener('touchmove', function (e) {
+          const t = e.touches[0];
+          setMouse(t.clientX, t.clientY, true);
+        }, { passive: true });
+        window.addEventListener('touchend', function () { setMouse(null, null, false); });
+
+        setTimeout(initParticles, 100);
+        draw();
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

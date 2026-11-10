@@ -36,6 +36,4 @@ jobs:
       - name: Deploy frontend
         run: railway up
         env:
-        run: railway up
-        env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

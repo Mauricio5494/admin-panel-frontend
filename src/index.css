@@ -18,6 +18,14 @@ body {
   color: var(--text);
   font-family: 'Courier New', Courier, monospace;
   line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 .container {
