@@ -53,14 +53,6 @@
         let particles = [];
         let mouse = { x: null, y: null, active: false };
 
-        function resize() {
-          width = canvas.width = window.innerWidth;
-          height = canvas.height = window.innerHeight;
-          initParticles();
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
         class Particle {
           constructor() { this.reset(); }
           reset() {
@@ -107,6 +99,14 @@
           particles = [];
           for (let i = 0; i < count; i++) particles.push(new Particle());
         }
+
+        function resize() {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+          initParticles();
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
         function draw() {
           ctx.clearRect(0, 0, width, height);
