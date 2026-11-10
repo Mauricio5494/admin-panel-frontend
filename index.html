@@ -60,8 +60,9 @@
             this.y = Math.random() * height;
             this.vx = (Math.random() - 0.5) * 0.5;
             this.vy = (Math.random() - 0.5) * 0.5;
-            this.size = Math.random() * 2 + 1;
-            this.alpha = Math.random() * 0.5 + 0.1;
+            this.size = Math.random() * 3 + 1;
+            this.alpha = Math.random() * 0.7 + 0.2;
+            this.originalAlpha = this.alpha;
           }
           update() {
             this.x += this.vx;
@@ -72,10 +73,13 @@
               const dx = mouse.x - this.x;
               const dy = mouse.y - this.y;
               const dist = Math.hypot(dx, dy);
-              if (dist < 200) {
-                const force = (200 - dist) / 200;
+              if (dist < 220) {
+                const force = (220 - dist) / 220;
                 this.vx += (dx / dist) * force * 0.02;
                 this.vy += (dy / dist) * force * 0.02;
+                this.alpha = Math.min(0.95, this.originalAlpha + force * 0.4);
+              } else {
+                this.alpha = Math.max(0.2, this.alpha - 0.01);
               }
             }
             const speed = Math.hypot(this.vx, this.vy);
@@ -83,7 +87,7 @@
               this.vx = (this.vx / speed) * 1.5;
               this.vy = (this.vy / speed) * 1.5;
             }
-            if (this.alpha > 0) this.alpha -= 0.001;
+            if (this.alpha > 0) this.alpha -= 0.0005;
             if (this.alpha <= 0) this.reset();
           }
           draw() {
@@ -95,7 +99,7 @@
         }
 
         function initParticles() {
-          const count = Math.min(80, Math.floor((width * height) / 20000));
+          const count = 150;
           particles = [];
           for (let i = 0; i < count; i++) particles.push(new Particle());
         }
@@ -109,19 +113,21 @@
         resize();
 
         function draw() {
-          ctx.clearRect(0, 0, width, height);
+          // Trail suave con fade-out en lugar de borrado limpio
+          ctx.fillStyle = 'rgba(5, 5, 5, 0.15)';
+          ctx.fillRect(0, 0, width, height);
           ctx.beginPath();
           for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
               const dx = particles[i].x - particles[j].x;
               const dy = particles[i].y - particles[j].y;
               const dist = Math.hypot(dx, dy);
-              if (dist < 150) {
-                const opacity = 1 - dist / 150;
+              if (dist < 160) {
+                const opacity = (1 - dist / 160) * 0.7;
                 ctx.moveTo(particles[i].x, particles[i].y);
                 ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.strokeStyle = 'rgba(255, 170, 0, ' + (opacity * 0.4) + ')';
-                ctx.lineWidth = 0.8;
+                ctx.strokeStyle = 'rgba(255, 170, 0, ' + opacity + ')';
+                ctx.lineWidth = opacity * 1.2;
               }
             }
           }
@@ -129,8 +135,8 @@
           particles.forEach(function (p) { p.update(); p.draw(); });
           if (mouse.active) {
             ctx.beginPath();
-            ctx.arc(mouse.x, mouse.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 170, 0, 0.8)';
+            ctx.arc(mouse.x, mouse.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 170, 0, 0.6)';
             ctx.fill();
           }
           requestAnimationFrame(draw);
